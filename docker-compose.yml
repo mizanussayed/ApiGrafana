@@ -1,0 +1,89 @@
+services:
+  # .NET Minimal API
+  api:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    networks:
+      - monitoring
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - api
+    networks:
+      - monitoring
+
+  # Log Collector Service
+  log-collector:
+    build:
+      context: ./log-collector
+      dockerfile: Dockerfile
+    environment:
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=my-super-secret-auth-token
+      - INFLUXDB_ORG=my-org
+      - INFLUXDB_BUCKET=api-metrics
+    volumes:
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - influxdb
+      - nginx
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  # InfluxDB
+  influxdb:
+    image: influxdb:2.7
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password123
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=api-metrics
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token
+      - DOCKER_INFLUXDB_INIT_RETENTION=2d
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - ./scripts:/docker-entrypoint-initdb.d
+    networks:
+      - monitoring
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - influxdb
+    networks:
+      - monitoring
+
+volumes:
+  influxdb_data:
+  grafana_data:
+
+networks:
+  monitoring:
+    driver: bridge

@@ -1,0 +1,33 @@
+# Logs
+nginx/logs/*.log
+nginx/logs/*.gz
+
+# Docker volumes
+/var/lib/docker/volumes/
+
+# .NET
+bin/
+obj/
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp
