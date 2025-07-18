@@ -24,7 +24,7 @@ make_request() {
 
 # Main loop
 counter=0
-while true; do
+while [ $counter -lt 100 ]; do
     counter=$((counter + 1))
     
     # Random endpoint selection

@@ -2,8 +2,21 @@
 nginx/logs/*.log
 nginx/logs/*.gz
 
-# Docker volumes
-/var/lib/docker/volumes/
+# Environment files (contain sensitive data)
+.env
+.env.local
+.env.*.local
+
+# Dashboard backups and temporary files
+.grafana-password*
+*.backup
+enhanced-*.json
+*-spec.json
+
+# Docker volumes and data
+**/data/
+influxdb_data/
+grafana_data/
 
 # .NET
 bin/
