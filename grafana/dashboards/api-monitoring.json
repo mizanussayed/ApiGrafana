@@ -15,12 +15,37 @@
       }
     ]
   },
+  "description": "Real-time API monitoring dashboard for performance tracking and health analytics",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "id": null,
-  "links": [],
-  "liveNow": false,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Project Repository",
+      "tooltip": "View source code",
+      "type": "link",
+      "url": "https://github.com/mizanussayed/ApiGrafana"
+    },
+    {
+      "asDropdown": false,
+      "icon": "info",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Dashboard Info",
+      "tooltip": "Dashboard information",
+      "type": "dashboards"
+    }
+  ],
+  "liveNow": true,
   "panels": [
     {
       "datasource": {
@@ -30,7 +55,37 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Total Requests",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 30,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "thresholds": {
@@ -41,53 +96,66 @@
                 "value": null
               },
               {
-                "color": "yellow",
-                "value": 1000
-              },
-              {
                 "color": "red",
-                "value": 5001
+                "value": 80
               }
             ]
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "requests"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 6,
         "x": 0,
         "y": 0
       },
       "id": 1,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
+        "legend": {
           "calcs": [
-            "lastNotNull"
+            "last",
+            "max",
+            "mean"
           ],
-          "fields": ""
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
-        "textMode": "auto"
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
-      "pluginVersion": "9.0.0",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "influxdb"
           },
-          "query": "from(bucket: \"api-metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"api_requests\")\n  |> filter(fn: (r) => r[\"_field\"] == \"request_count\")\n  |> sum()",
+          "query": "from(bucket: \"api-metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"api_requests\")\n  |> filter(fn: (r) => r[\"_field\"] == \"request_count\")\n  |> aggregateWindow(every: 1m, fn: sum, createEmpty: true)",
           "refId": "A"
         }
       ],
-      "title": "Total API Requests",
-      "type": "stat"
+      "title": "Total Requests",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -104,15 +172,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "rgba(50, 172, 45, 0.97)",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "rgba(237, 129, 40, 0.89)",
                 "value": 100
               },
               {
-                "color": "red",
+                "color": "rgba(245, 54, 54, 0.9)",
                 "value": 500
               }
             ]
@@ -122,17 +190,17 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 6,
         "x": 6,
         "y": 0
       },
       "id": 2,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
+        "justifyMode": "center",
+        "orientation": "horizontal",
         "reduceOptions": {
           "values": false,
           "calcs": [
@@ -140,9 +208,10 @@
           ],
           "fields": ""
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
-      "pluginVersion": "9.0.0",
+      "pluginVersion": "10.0.0",
       "targets": [
         {
           "datasource": {
@@ -171,15 +240,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "rgba(50, 172, 45, 0.97)",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "rgba(237, 129, 40, 0.89)",
                 "value": 10
               },
               {
-                "color": "red",
+                "color": "rgba(245, 54, 54, 0.9)",
                 "value": 50
               }
             ]
@@ -189,17 +258,17 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 6,
         "x": 12,
         "y": 0
       },
       "id": 3,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
+        "justifyMode": "center",
+        "orientation": "horizontal",
         "reduceOptions": {
           "values": false,
           "calcs": [
@@ -207,16 +276,17 @@
           ],
           "fields": ""
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
-      "pluginVersion": "9.0.0",
+      "pluginVersion": "10.0.0",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "influxdb"
           },
-          "query": "from(bucket: \"api-metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"api_errors\")\n  |> filter(fn: (r) => r[\"_field\"] == \"error_count\")\n  |> sum()",
+          "query": "from(bucket: \"api-metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"api_requests\")\n  |> filter(fn: (r) => r[\"_field\"] == \"request_count\")\n  |> filter(fn: (r) => int(v: r.status_code) != 200 and int(v: r.status_code) != 201 and int(v: r.status_code) != 204)\n  |> sum()",
           "refId": "A"
         }
       ],
@@ -238,15 +308,15 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "rgba(50, 172, 45, 0.97)",
                 "value": null
               },
               {
-                "color": "yellow",
+                "color": "rgba(237, 129, 40, 0.89)",
                 "value": 5
               },
               {
-                "color": "red",
+                "color": "rgba(245, 54, 54, 0.9)",
                 "value": 20
               }
             ]
@@ -256,17 +326,17 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 6,
         "x": 18,
         "y": 0
       },
       "id": 4,
       "options": {
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
+        "justifyMode": "center",
+        "orientation": "horizontal",
         "reduceOptions": {
           "values": false,
           "calcs": [
@@ -274,9 +344,10 @@
           ],
           "fields": ""
         },
-        "textMode": "auto"
+        "textMode": "value_and_name",
+        "wideLayout": true
       },
-      "pluginVersion": "9.0.0",
+      "pluginVersion": "10.0.0",
       "targets": [
         {
           "datasource": {
@@ -287,7 +358,7 @@
           "refId": "A"
         }
       ],
-      "title": "HTTP 4xx/5xx Errors",
+      "title": "HTTP Errors (4xx/5xx)",
       "type": "stat"
     },
     {
@@ -301,24 +372,26 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "",
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Requests per minute",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "vis": false
             },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
+            "showPoints": "auto",
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -344,20 +417,41 @@
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "requests"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 12,
         "x": 0,
-        "y": 6
+        "y": 8
       },
       "id": 5,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "calcs": [
+            "last",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
@@ -388,31 +482,33 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "",
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Response Time (ms)",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "vis": false
             },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
+            "showPoints": "auto",
             "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "none"
             },
             "thresholdsStyle": {
-              "mode": "off"
+              "mode": "line"
             }
           },
           "mappings": [],
@@ -424,27 +520,52 @@
                 "value": null
               },
               {
+                "color": "yellow",
+                "value": 200
+              },
+              {
                 "color": "red",
-                "value": 80
+                "value": 500
               }
             ]
           },
           "unit": "ms"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "response_time"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 12,
         "x": 12,
-        "y": 6
+        "y": 8
       },
       "id": 6,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "calcs": [
+            "last",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
@@ -481,15 +602,36 @@
               "vis": false
             }
           },
-          "mappings": []
+          "mappings": [
+            {
+              "options": {
+                "200": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Success"
+                },
+                "404": {
+                  "color": "yellow",
+                  "index": 1,
+                  "text": "Not Found"
+                },
+                "500": {
+                  "color": "red",
+                  "index": 2,
+                  "text": "Server Error"
+                }
+              },
+              "type": "value"
+            }
+          ]
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 12,
         "x": 0,
-        "y": 14
+        "y": 17
       },
       "id": 7,
       "options": {
@@ -507,8 +649,16 @@
         },
         "legend": {
           "displayMode": "table",
-          "placement": "right"
-        }
+          "placement": "bottom",
+          "showLegend": true,
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "displayLabels": [
+          "percent"
+        ]
       },
       "targets": [
         {
@@ -520,7 +670,7 @@
           "refId": "A"
         }
       ],
-      "title": "HTTP Status Code Distribution",
+      "title": "Status Code Distribution",
       "type": "piechart"
     },
     {
@@ -534,11 +684,13 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisLabel": "",
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Request Count",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "bars",
-            "fillOpacity": 100,
+            "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -551,7 +703,7 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
+            "showPoints": "auto",
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -580,21 +732,24 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 12,
         "x": 12,
-        "y": 14
+        "y": 17
       },
       "id": 8,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
           "mode": "single",
-          "sort": "none"
+          "sort": "desc"
         }
       },
       "targets": [
@@ -603,23 +758,23 @@
             "type": "influxdb",
             "uid": "influxdb"
           },
-          "query": "from(bucket: \"api-metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"api_requests\")\n  |> filter(fn: (r) => r[\"_field\"] == \"request_count\")\n  |> group(columns: [\"endpoint\"])\n  |> sum()",
+          "query": "from(bucket: \"api-metrics\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"api_requests\")\n  |> filter(fn: (r) => r[\"_field\"] == \"request_count\")\n  |> group(columns: [\"endpoint\"])\n  |> sum()\n  |> group()\n  |> sort(columns: [\"_value\"], desc: true)\n  |> limit(n: 10)\n  |> map(fn: (r) => ({ r with _time: now(), endpoint: if exists r.endpoint then string(v: r.endpoint) else \"unknown\" }))\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"endpoint\"], valueColumn: \"_value\")",
           "refId": "A"
         }
       ],
-      "title": "Top Endpoints by Request Volume",
+      "title": "Top Endpoints by Volume",
       "type": "barchart"
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 36,
+  "schemaVersion": 37,
   "style": "dark",
   "tags": [
-    "production",
-    "api-monitoring",
-    "application-logs",
-    "performance-metrics",
-    "infrastructure"
+    "api",
+    "monitoring",
+    "performance",
+    "logs",
+    "metrics"
   ],
   "templating": {
     "list": []
@@ -630,8 +785,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "API Application Monitoring Dashboard",
+  "title": "API Performance Monitoring",
   "uid": "api-monitoring",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
